@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model BuildFile {
+  @@map("build_files")
+  ID            Int        @id @default(autoincrement())
+  slice_file_ID Int?
+  file_name     String?    @db.VarChar(45)
+  blob_name     String?    @db.VarChar(45)
+  container     String?    @db.VarChar(45)
+  upload_time   DateTime?  @db.DateTime(0)
+  SliceFile     SliceFile? @relation(fields: [slice_file_ID], references: [ID])
+  Runs          Run[]
+}
+
+model CADFile {
+  @@map("cad_files")
+  ID            Int       @id @default(autoincrement())
+  parent_CAD_ID Int?
+  file_name     String?   @db.VarChar(45)
+  container     String?   @db.VarChar(45)
+  upload_time   DateTime? @db.DateTime(0)
+  blob_name     String?   @db.VarChar(45)
+  ParentCAD     CADFile?  @relation("ParentCAD", fields: [parent_CAD_ID], references: [ID])
+  Children      CADFile[] @relation("ParentCAD")
+  CustomerParts CustomerPart[]
+  SliceFiles    SliceFile[]
+}
+
+model Contract {
+  @@map("contract")
+  ID          Int  @id @default(autoincrement())
+  customer_ID Int?
+  Customer    Customer?  @relation(fields: [customer_ID], references: [ID])
+  Jobs        Job[]
+}
+
+model Customer {
+  @@map("customer")
+  ID           Int     @id @default(autoincrement())
+  name         String? @db.VarChar(45)
+  gov_not_comm Int?    @db.TinyInt
+  Contracts    Contract[]
+  CustomerParts CustomerPart[]
+}
+
+model CustomerPart {
+  @@map("customer_parts")
+  ID          Int  @id @default(autoincrement())
+  customer_ID Int?
+  CAD_file_ID Int?
+  Customer    Customer? @relation(fields: [customer_ID], references: [ID])
+  CADFile     CADFile?  @relation(fields: [CAD_file_ID], references: [ID])
+}
+
+model Job {
+  @@map("job")
+  ID          Int     @id @default(autoincrement())
+  contract_ID Int?
+  name        String? @db.VarChar(45)
+  Contract    Contract? @relation(fields: [contract_ID], references: [ID])
+  Runs        Run[]
+}
+
+model Run {
+  @@map("run")
+  ID            Int       @id @default(autoincrement())
+  influx_UUID   BigInt?   @db.UnsignedBigInt
+  job_ID        Int?
+  configuration String?   @db.VarChar(15)
+  build_file_ID Int?
+  start_time    DateTime? @db.DateTime(0)
+  end_time      DateTime? @db.DateTime(0)
+  operator_ID   Int?
+  cell_ID       Int?
+  status        String?   @db.VarChar(15)
+  Job           Job?      @relation(fields: [job_ID], references: [ID])
+  BuildFile     BuildFile? @relation(fields: [build_file_ID], references: [ID])
+  Scans         ScanRaw[]
+}
+
+model ScanMetric {
+  @@map("scan_metric")
+  ID                    Int       @id @default(autoincrement())
+  scan_ID               Int?
+  container             String?   @db.VarChar(45)
+  zmetric_file_name     String?   @db.VarChar(45)
+  zmetric_upload_time   DateTime? @db.DateTime(0)
+  proximity_file_name   String?   @db.VarChar(45)
+  proximity_upload_time DateTime? @db.DateTime(0)
+  ScanRaw               ScanRaw?  @relation(fields: [scan_ID], references: [ID])
+}
+
+model ScanRaw {
+  @@map("scan_raw")
+  ID               Int       @id @default(autoincrement())
+  run_ID           Int?
+  cell_ID          Int?
+  operator_ID      Int?
+  container        String?   @db.VarChar(45)
+  scan_file_name   String?   @db.VarChar(45)
+  scan_blob_name   String?   @db.VarChar(45)
+  scan_upload_time DateTime? @db.DateTime(0)
+  rsi_file_name    String?   @db.VarChar(45)
+  rsi_blob_name    String?   @db.VarChar(45)
+  rsi_upload_time  DateTime? @db.DateTime(0)
+  Run              Run?      @relation(fields: [run_ID], references: [ID])
+  ScanMetrics      ScanMetric[]
+  Results          ScanResult[]
+}
+
+model ScanResult {
+  @@map("scan_result")
+  ID                  Int       @id @default(autoincrement())
+  scan_ID             Int?
+  container           String?   @db.VarChar(45)
+  mesh_file_name      String?   @db.VarChar(45)
+  mesh_blob_name      String?   @db.VarChar(45)
+  mesh_upload_time    DateTime? @db.DateTime(0)
+  ptcloud_file_name   String?   @db.VarChar(45)
+  ptcloud_blob_name   String?   @db.VarChar(45)
+  ptcloud_upload_time DateTime? @db.DateTime(0)
+  ScanRaw             ScanRaw?  @relation(fields: [scan_ID], references: [ID])
+}
+
+model SliceFile {
+  @@map("slice_files")
+  ID          Int       @id @default(autoincrement())
+  CAD_file_ID Int?
+  file_name   String?   @db.VarChar(45)
+  blob_name   String?   @db.VarChar(45)
+  container   String?   @db.VarChar(45)
+  upload_time DateTime? @db.DateTime(0)
+  CADFile     CADFile?  @relation(fields: [CAD_file_ID], references: [ID])
+  BuildFiles  BuildFile[]
+}
