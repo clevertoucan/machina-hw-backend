@@ -23,10 +23,15 @@ function sanitizeBigInts(jsonData) {
 }
 
 async function getById(req, res, model) {
-  const { id } = req.params;
-  const found = await model.findUnique({
-    where: { id: Number(id) },
-  });
+  let { id } = req.params;
+  let { include } = req.query;
+  let found;
+  if (include) {
+    include = JSON.parse(include);
+    found = await model.findUnique({ where: { id: Number(id) }, include });
+  } else {
+    found = await model.findUnique({ where: { id: Number(id) } });
+  }
   if (found === null) {
     return res.sendStatus(404);
   }
@@ -35,7 +40,14 @@ async function getById(req, res, model) {
 }
 
 async function getList(req, res, model) {
-  let found = await model.findMany();
+  let { include } = req.query;
+  let found;
+  if (include) {
+    include = JSON.parse(include);
+    found = await model.findMany({ include });
+  } else {
+    found = await model.findMany();
+  }
   if (found === null) {
     return res.sendStatus(404);
   }
