@@ -9,7 +9,7 @@ const client = new PrismaClient();
  * @param {*} jsonData
  * @returns
  */
-function sanitizeBigInts(jsonData) {
+export function sanitizeBigInts(jsonData) {
   if (typeof jsonData === "object") {
     for (var key in jsonData) {
       if (typeof jsonData[key] === "bigint") {

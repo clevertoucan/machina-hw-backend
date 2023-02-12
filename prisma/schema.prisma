@@ -17,6 +17,8 @@ model BuildFile {
   upload_time   DateTime?  @db.DateTime(0)
   SliceFile     SliceFile? @relation(fields: [slice_file_ID], references: [ID])
   Runs          Run[]
+  job_ID        Int?
+  Job           Job?       @relation(fields: [job_ID], references: [ID])
 }
 
 model CADFile {
@@ -31,6 +33,8 @@ model CADFile {
   Children      CADFile[] @relation("ParentCAD")
   CustomerParts CustomerPart[]
   SliceFiles    SliceFile[]
+  job_ID        Int?
+  Job           Job?       @relation(fields: [job_ID], references: [ID])
 }
 
 model Contract {
@@ -66,6 +70,12 @@ model Job {
   name        String? @db.VarChar(45)
   Contract    Contract? @relation(fields: [contract_ID], references: [ID])
   Runs        Run[]
+  BuildFiles  BuildFile[]
+  CADFiles    CADFile[]
+  ScanMetrics ScanMetric[]
+  ScanRaws    ScanRaw[]
+  ScanResults ScanResult[]
+  SliceFiles  SliceFile[]
 }
 
 model Run {
@@ -95,6 +105,8 @@ model ScanMetric {
   proximity_file_name   String?   @db.VarChar(45)
   proximity_upload_time DateTime? @db.DateTime(0)
   ScanRaw               ScanRaw?  @relation(fields: [scan_ID], references: [ID])
+  job_ID        Int?
+  Job           Job?       @relation(fields: [job_ID], references: [ID])
 }
 
 model ScanRaw {
@@ -113,6 +125,8 @@ model ScanRaw {
   Run              Run?      @relation(fields: [run_ID], references: [ID])
   ScanMetrics      ScanMetric[]
   Results          ScanResult[]
+  job_ID        Int?
+  Job           Job?       @relation(fields: [job_ID], references: [ID])
 }
 
 model ScanResult {
@@ -127,6 +141,8 @@ model ScanResult {
   ptcloud_blob_name   String?   @db.VarChar(45)
   ptcloud_upload_time DateTime? @db.DateTime(0)
   ScanRaw             ScanRaw?  @relation(fields: [scan_ID], references: [ID])
+  job_ID        Int?
+  Job           Job?       @relation(fields: [job_ID], references: [ID])
 }
 
 model SliceFile {
@@ -139,4 +155,6 @@ model SliceFile {
   upload_time DateTime? @db.DateTime(0)
   CADFile     CADFile?  @relation(fields: [CAD_file_ID], references: [ID])
   BuildFiles  BuildFile[]
+  job_ID        Int?
+  Job           Job?    @relation(fields: [job_ID], references: [ID])
 }
