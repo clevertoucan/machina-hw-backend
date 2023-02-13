@@ -1,3 +1,5 @@
+# Setup
+
 To initialize the backend:
 
 - Import the `dump.sql` into a MySQL instance
