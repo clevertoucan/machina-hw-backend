@@ -22,6 +22,15 @@ export function sanitizeBigInts(jsonData) {
   return jsonData;
 }
 
+/**
+ * GET /api/<modelname>/<id>
+ * This is the main single object fetch function that each model uses. Supports an 'include' query parameter
+ * that can be used to add relations to the object that comes back
+ * @param req Express request
+ * @param res Express response
+ * @param model The Prisma model that corresponds to the request
+ * @returns a single database object
+ */
 async function getById(req, res, model) {
   let { id } = req.params;
   let { include } = req.query;
@@ -39,6 +48,15 @@ async function getById(req, res, model) {
   return res.json(res.body);
 }
 
+/**
+ * GET /api/<modelname>
+ * This is the main multi-fetch function that each model uses. Supports an 'include' query parameter
+ * that can be used to add relations to the objects that come back
+ * @param req Express request
+ * @param res Express response
+ * @param model The Prisma model that corresponds to the request
+ * @returns multiple database objects in an array
+ */
 async function getList(req, res, model) {
   let { include } = req.query;
   let found;

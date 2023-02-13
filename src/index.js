@@ -5,6 +5,7 @@ import cors from "cors";
 const app = express();
 const port = 3001;
 
+// need to allow CORS to use the backend from a frontend script
 app.use(
   cors({
     origin: true,
@@ -17,7 +18,7 @@ app.use("/api", dbRouter);
 app.use("/fs", fsRouter);
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("OK");
 });
 
 app.listen(port, () => {

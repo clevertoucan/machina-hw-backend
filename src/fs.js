@@ -8,6 +8,12 @@ const client = new PrismaClient();
 const router = Router();
 const baseDir = "./web_hw_files";
 
+/**
+ * GET /fs/path/<path_to_file>
+ * This route handles all of the file requests - if the path exists, the route will
+ * send back the file data if the path leads to a file, or if the path is a directory,
+ * it will return an array of filenames contained in the directory
+ */
 router.get("/path/*", async (req, res) => {
   const filePath = baseDir + req.originalUrl.replace("/fs/path", "");
   console.log(filePath);
@@ -23,6 +29,13 @@ router.get("/path/*", async (req, res) => {
   }
 });
 
+/**
+ * GET /fs/tree
+ * This function converts the structure of a directory into JSON to send
+ * to the frontend so that we can build our document tree explorer
+ * @param currentDir the current directory
+ * @returns a JSON object representing the structure of the input directory
+ */
 function tree(currentDir) {
   if (fs.existsSync(currentDir)) {
     const fileTree = {};
@@ -38,6 +51,13 @@ function tree(currentDir) {
   }
 }
 
+/**
+ * GET /fs/list
+ * This function fetches all of the files in the database with relations that
+ * will be required for filtering.
+ * @param req Express request
+ * @param res Express response
+ */
 async function list(req, res) {
   const clients = [
     client.cADFile,
